@@ -51,14 +51,14 @@ function Header(props: Props) {
     const drawer = (
         <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }} className='mobileNavBar'>
             <Typography variant="h6" sx={{ my: 2 }}>
-                MUI
+                Mastermind
             </Typography>
             <Divider />
             <List>
                 {navItems.map((item) => (
                     <ListItem key={item.label} disablePadding>
                         <Link to={item.route}>
-                            <ListItemButton sx={{ textAlign: 'center' }}>
+                            <ListItemButton sx={{ textAlign: 'center', color: '#fff' }}>
                                 <ListItemText primary={item.label} />
                             </ListItemButton>
                         </Link>

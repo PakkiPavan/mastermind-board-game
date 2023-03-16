@@ -30,11 +30,18 @@ function Board() {
                 }}
             >
                 {/* Available Colors */}
-                <Box>
+                <Box
+                    sx={{
+                        borderBottom: '2px solid black',
+                        marginBottom: '5px'
+                    }}
+                >
                     {
-                        availableColors.map((color: string) => {
+                        availableColors.map((color: string, index: number) => {
                             return (
-                                renderCircle(color)
+                                <React.Fragment key={index}>
+                                    {renderCircle(color)}
+                                </React.Fragment>
                             )
                         })
                     }
@@ -42,13 +49,15 @@ function Board() {
                 {/* Board to place the colors */}
                 <Box>
                     {
-                        generateNumbersArray(10).map(() => {
+                        generateNumbersArray(10).map((_, index: number) => {
                             return (
-                                <div>
+                                <div key={index}>
                                     {
-                                        generateNumbersArray(4).map(() => {
+                                        generateNumbersArray(4).map((_, index:number) => {
                                             return (
-                                                renderCircle()
+                                                <React.Fragment key={index}>
+                                                    {renderCircle()}
+                                                </React.Fragment>
                                             )
                                         })
                                     }
