@@ -1,0 +1,8 @@
+.headerContainer a,
+.mobileNavBar a {
+    text-decoration: none;
+}
+
+.mobileNavBar a {
+    width: 100%;
+}
