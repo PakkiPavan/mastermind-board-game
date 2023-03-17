@@ -9,12 +9,27 @@ const defaultCurrentColor = "green";
 const defaultCurrentColorId = "availableColor-green-1";
 const circleAnimation = "blink 0.3s infinite";
 
+const getRandomColors = (numOfColors: number) => {
+    const result: string[] = [];
+    while (result.length < numOfColors) {
+        const randomIndex = Math.floor(Math.random() * availableColors.length);
+        const randomColor = availableColors[randomIndex];
+        if (!result.includes(randomColor)) {
+            result.push(randomColor);
+        }
+    }
+    return result;
+}
+
 function Board() {
     const [currentColor, setCurrentColor] = React.useState(defaultCurrentColor);
     const [currentRowNumber, setCurrentRowNumber] = React.useState(1);
+    const [secretCode, setSecretCode] = React.useState<string[]>([]);
+    const [gameOver, setGameOver] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         addAnimationToFirstColor(true);
+        setSecretCode(getRandomColors(4));
     }, [])
 
     const addAnimationToFirstColor = (state: boolean) => {
@@ -58,7 +73,7 @@ function Board() {
             <button
                 id={id}
                 className="circle"
-                disabled={disabled}
+                disabled={gameOver ? true : disabled}
                 style={{
                     backgroundColor: bgColor ? bgColor : undefined,
                     animation: animationRequired ? circleAnimation : undefined,
@@ -81,7 +96,7 @@ function Board() {
                 className="checkButton"
                 variant="contained"
                 color="inherit"
-                disabled={disabled}
+                disabled={gameOver ? true : disabled}
                 sx={{
                     backgroundColor: "white",
                     color: "black"
@@ -96,21 +111,20 @@ function Board() {
     const renderHint = (id: string, currentRowIndex: number) => {
 
         return (
-            <Box
-                id={id}
-                sx={{
-                    width: '40px',
-                    height: '40px',
-                    backgroundColor: 'white',
-                }}
+            <div
+                className="hints"
+                id={`hints-${currentRowIndex}`}
             >
-
-            </Box>
+                <div className="hintCircle"></div>
+                <div className="hintCircle"></div>
+                <div className="hintCircle"></div>
+                <div className="hintCircle"></div>
+            </div>
         )
     };
 
     const handleCheckButtonClick = (currentRowIndex: number) => {
-        console.log("handleCheckButtonClick", currentRowIndex);
+
         const selectedColors: string[] = [];
         for (let index = 1; index <= 4; index++) {
             const selectableColorElement = document.getElementById(`selectableColor-${currentRowIndex}${index}`) as any;
@@ -123,15 +137,41 @@ function Board() {
         }
 
         if (selectedColors.length === 4) {
-            if(selectedColors.length !== [...new Set(selectedColors)].length){
+            if (selectedColors.length !== [...new Set(selectedColors)].length) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: 'Duplicate colors not allowed',
                 })
             }
-            else{
-                setCurrentRowNumber(currentRowNumber + 1);
+            else {
+                console.log("secretCode", secretCode);
+                console.log("selectedCode", selectedColors);
+                const result = validateCode(secretCode, selectedColors);
+                console.log("result", result);
+                if (result.samePosition === 4) {
+                    setGameOver(true);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'You Won',
+                        text: 'Congratulations!! You won the game',
+                    })
+                }
+                else{
+                    setCurrentRowNumber(currentRowNumber + 1);
+                }
+                const hintElement = document.getElementById(`hints-${currentRowIndex}`) as any;
+                const child = hintElement.children;
+                if (result.samePosition) {
+                    for (let i = 0; i < result.samePosition; i++) {
+                        child[i].style.backgroundColor = "green";
+                    }
+                }
+                if (result.differentPosition) {
+                    for (let i = result.samePosition; i < result.samePosition + result.differentPosition; i++) {
+                        child[i].style.backgroundColor = "red";
+                    }
+                }
             }
         }
         else {
@@ -146,6 +186,23 @@ function Board() {
 
     const generateNumbersArray = (length: number) => {
         return Array.from({ length: length }, (_, index) => index + 1);
+    };
+
+    const validateCode = (secretCode: string[], selectedCode: string[]) => {
+        let samePosition = 0;
+        let differentPosition = 0;
+        for (let i = 0; i < secretCode.length; i++) {
+            if (secretCode[i] === selectedCode[i]) {
+                samePosition++;
+            }
+            else if (secretCode.includes(selectedCode[i])) {
+                differentPosition++;
+            }
+        }
+        return {
+            samePosition,
+            differentPosition
+        }
     };
 
     return (

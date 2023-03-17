@@ -25,9 +25,46 @@
     text-align: center;
 }
 
-.checkButtonContainer{
+.checkButtonContainer {
     margin-right: 1rem;
 }
+
+.hints {
+    position: relative;
+    width: 35px;
+    height: 35px;
+    background-color: white;
+}
+
+.hintCircle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: lightgray;
+    margin: 5px;
+}
+
+.hintCircle:nth-child(1) {
+    top: 0;
+    left: 0;
+}
+
+.hintCircle:nth-child(2) {
+    top: 0;
+    right: 0;
+}
+
+.hintCircle:nth-child(3) {
+    bottom: 0;
+    left: 0;
+}
+
+.hintCircle:nth-child(4) {
+    bottom: 0;
+    right: 0;
+}
+
 
 @keyframes blink {
     0% {
@@ -38,17 +75,3 @@
         border: 2px solid #fff;
     }
 }
-
-/* @keyframes blink {
-    0% {
-        border-color: #000;
-    }
-
-    50% {
-        border-color: transparent;
-    }
-
-    100% {
-        border-color: #000;
-    }
-} */
