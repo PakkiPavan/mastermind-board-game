@@ -2,13 +2,44 @@
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    border: 2px solid #000;
     cursor: pointer;
-    margin: 0 0.2rem;
+    margin: 3px;
+    outline: none;
+    border: none;
     /* animation: blink 0.5s infinite; */
 }
 
+.circle:disabled {
+    cursor: not-allowed;
+}
+
+.checkButton:disabled {
+    pointer-events: all !important;
+    cursor: not-allowed !important;
+}
+
+.selectableRowContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.checkButtonContainer{
+    margin-right: 1rem;
+}
+
 @keyframes blink {
+    0% {
+        border: 2px solid #000;
+    }
+
+    100% {
+        border: 2px solid #fff;
+    }
+}
+
+/* @keyframes blink {
     0% {
         border-color: #000;
     }
@@ -20,4 +51,4 @@
     100% {
         border-color: #000;
     }
-}
+} */

@@ -8,7 +8,6 @@ import {
 import Board from './components/Board/Board';
 import Rules from './components/Rules/Rules';
 
-
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',
