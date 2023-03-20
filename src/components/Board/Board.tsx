@@ -217,6 +217,20 @@ function Board() {
         }
     };
 
+    const resetGame=()=>{
+        setCurrentColor(defaultCurrentColor);
+        setCurrentRowNumber(1);
+        setGameOver(false);
+        addAnimationToFirstColor(true);
+        setSecretCode(getRandomColors(4));
+        // for(let i=1;i<=10;i++){
+        //     for(let j=1;j<=4;j++){
+        //         const circle = document.getElementById(`selectableColor-${i}${j}`) as any;
+        //         circle.style.backgroundColor = i === 1 ? "white" : "rgba(239, 239, 239, 0.3)";
+        //     }
+        // }
+    };
+
     return (
         <>
             <Toolbar />
@@ -228,6 +242,25 @@ function Board() {
                     margin: 'auto',
                 }}
             >
+                {/* Reset game actions */}
+                <Box
+                    sx={{
+                        borderBottom: "2px solid black",
+                        marginBottom: '5px',
+                        textAlign: "center"
+                    }}
+                >
+                    <Button
+                        color="error"
+                        variant="contained"
+                        style={{
+                            marginBottom: '5px',
+                        }}
+                        onClick={resetGame}
+                    >
+                        Reset Game
+                    </Button>
+                </Box>
                 {/* Available Colors */}
                 <Box
                     sx={{
@@ -249,7 +282,7 @@ function Board() {
                 {/* Board to place the colors */}
                 <Box>
                     {
-                        generateNumbersArray(3).map((_1, index1: number) => {
+                        generateNumbersArray(10).map((_1, index1: number) => {
                             return (
                                 <div key={index1} className="selectableRowContainer">
                                     <div style={{ marginRight: "1rem" }}>
