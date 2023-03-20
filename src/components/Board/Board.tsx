@@ -50,14 +50,14 @@ function Board() {
         }
     };
 
-    const renderCircle = (id: string, bgColor?: string) => {
+    const renderCircle = (id: string, bgColor?: string, customElement?: any) => {
         let animationRequired = false;
         let disabled = true;
 
         if (id.includes("availableColor")) {
             disabled = false;
             const focusColor = id.split("-")[1];
-            if (currentColor === focusColor) {
+            if (!gameOver && currentColor === focusColor) {
                 animationRequired = true;
             }
         }
@@ -67,6 +67,9 @@ function Board() {
             if (parseInt(currentRowIndex) === currentRowNumber) {
                 disabled = false;
             }
+        }
+        else if(id.includes("secretColor")){
+            disabled = false;
         }
 
         return (
@@ -79,7 +82,7 @@ function Board() {
                     animation: animationRequired ? circleAnimation : undefined,
                 }}
                 onClick={(event: any) => handleColorClick(event)}
-            ></button>
+            >{customElement}</button>
         )
     };
 
@@ -148,7 +151,7 @@ function Board() {
                 console.log("secretCode", secretCode);
                 console.log("selectedCode", selectedColors);
                 const result = validateCode(secretCode, selectedColors);
-                console.log("result", result);
+
                 if (result.samePosition === 4) {
                     setGameOver(true);
                     Swal.fire({
@@ -156,8 +159,9 @@ function Board() {
                         title: 'You Won',
                         text: 'Congratulations!! You won the game',
                     })
+                    return;
                 }
-                else{
+                else {
                     setCurrentRowNumber(currentRowNumber + 1);
                 }
                 const hintElement = document.getElementById(`hints-${currentRowIndex}`) as any;
@@ -179,6 +183,14 @@ function Board() {
                 icon: 'error',
                 title: 'Error',
                 text: 'Select all 4 colors',
+            })
+        }
+        if (currentRowIndex === 10) {
+            setGameOver(true);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'You lost the game',
             })
         }
 
@@ -211,7 +223,7 @@ function Board() {
             <Box
                 sx={{
                     width: '50%',
-                    height: '100vh',
+                    // height: '100vh',
                     backgroundColor: 'darkgray',
                     margin: 'auto',
                 }}
@@ -237,7 +249,7 @@ function Board() {
                 {/* Board to place the colors */}
                 <Box>
                     {
-                        generateNumbersArray(10).map((_1, index1: number) => {
+                        generateNumbersArray(3).map((_1, index1: number) => {
                             return (
                                 <div key={index1} className="selectableRowContainer">
                                     <div style={{ marginRight: "1rem" }}>
@@ -255,12 +267,43 @@ function Board() {
                                         {renderCheckButton(`checkButton-${index1 + 1}`, index1 + 1)}
                                     </div>
                                     <div className='hintContainer'>
-                                        {renderHint(`checkButton-${index1 + 1}`, index1 + 1)}
+                                        {renderHint(`hint-${index1 + 1}`, index1 + 1)}
                                     </div>
                                 </div>
                             )
                         })
                     }
+                </Box>
+                {/* Secret Code */}
+                <Box
+                    sx={{
+                        borderTop: '2px solid black',
+                        textAlign: 'center'
+                    }}
+                >
+                    <div className="selectableRowContainer">
+                        <div style={{ marginRight: "1rem" }}>
+                            {
+                                secretCode.map((color: string, index: number) => {
+                                    return (
+                                        <React.Fragment key={index}>
+                                            {
+                                                gameOver ?
+                                                renderCircle(`secretColor-${color}-${index + 1}`, color) :
+                                                renderCircle(`secretColor-${color}-${index + 1}`, undefined, "?")
+                                            }
+                                        </React.Fragment>
+                                    )
+                                })
+                            }
+                        </div>
+                        <div className='checkButtonContainer' style={{ visibility: 'hidden' }}>
+                            {renderCheckButton(`checkButton-11`, 11)}
+                        </div>
+                        <div className='hintContainer' style={{ visibility: 'hidden' }}>
+                            {renderHint(`hint-11`, 11)}
+                        </div>
+                    </div>
                 </Box>
             </Box>
         </>
