@@ -1,4 +1,5 @@
 # Mastermind Board Game
+[Demo](https://mastermind-board-game.netlify.app/)
 ## A Fun game to find the secret color code
 
 **How to Play Mastermind board game?**
