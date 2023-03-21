@@ -1,12 +1,11 @@
 import React from 'react';
 import "./Board.css";
-import { Button, Toolbar } from '@mui/material';
+import { Button, Toolbar, useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import Swal from 'sweetalert2';
 
 const availableColors = ["green", "red", "yellow", "blue", "pink", "skyblue", "black"];
 const defaultCurrentColor = "green";
-const defaultCurrentColorId = "availableColor-green-1";
 const circleAnimation = "blink 0.3s infinite";
 
 const getRandomColors = (numOfColors: number) => {
@@ -26,33 +25,29 @@ function Board() {
     const [currentRowNumber, setCurrentRowNumber] = React.useState(1);
     const [secretCode, setSecretCode] = React.useState<string[]>([]);
     const [gameOver, setGameOver] = React.useState<boolean>(false);
+    const [selectedColors, setSelectedColors] = React.useState<any>({});
+    const [allHints, setAllHints] = React.useState<any>({});
+    const maxWidthMediaQuery = useMediaQuery('(max-width:700px)');
 
     React.useEffect(() => {
-        addAnimationToFirstColor(true);
         setSecretCode(getRandomColors(4));
     }, [])
-
-    const addAnimationToFirstColor = (state: boolean) => {
-        const defaultFocusingColor = document.getElementById(defaultCurrentColorId) as any;
-        defaultFocusingColor.style.animation = state ? circleAnimation : undefined;
-    };
 
     const handleColorClick = (event: any) => {
         const id = event.target.id;
         if (id.includes("availableColor")) {
-            addAnimationToFirstColor(false);
             const currentColor = id.split("-")[1];
             setCurrentColor(currentColor);
         }
         else if (id.includes("selectableColor")) {
-            const currentSelectableElement = document.getElementById(id) as any;
-            currentSelectableElement.style.backgroundColor = currentColor;
+            setSelectedColors({ ...selectedColors, [id]: currentColor });
         }
     };
 
     const renderCircle = (id: string, bgColor?: string, customElement?: any) => {
         let animationRequired = false;
         let disabled = true;
+        let backgroundColor: any;
 
         if (id.includes("availableColor")) {
             disabled = false;
@@ -67,8 +62,9 @@ function Board() {
             if (parseInt(currentRowIndex) === currentRowNumber) {
                 disabled = false;
             }
+            backgroundColor = selectedColors[id];
         }
-        else if(id.includes("secretColor")){
+        else if (id.includes("secretColor")) {
             disabled = false;
         }
 
@@ -78,8 +74,10 @@ function Board() {
                 className="circle"
                 disabled={gameOver ? true : disabled}
                 style={{
-                    backgroundColor: bgColor ? bgColor : undefined,
+                    backgroundColor: bgColor ? bgColor : (backgroundColor ? backgroundColor : undefined),
                     animation: animationRequired ? circleAnimation : undefined,
+                    width: maxWidthMediaQuery ? '35px' : '40px',
+                    height: maxWidthMediaQuery ? '35px' : '40px',
                 }}
                 onClick={(event: any) => handleColorClick(event)}
             >{customElement}</button>
@@ -118,29 +116,26 @@ function Board() {
                 className="hints"
                 id={`hints-${currentRowIndex}`}
             >
-                <div className="hintCircle"></div>
-                <div className="hintCircle"></div>
-                <div className="hintCircle"></div>
-                <div className="hintCircle"></div>
+                <div className="hintCircle" style={{ backgroundColor: allHints[`hint-${currentRowIndex}1`] ? allHints[`hint-${currentRowIndex}1`] : undefined }}></div>
+                <div className="hintCircle" style={{ backgroundColor: allHints[`hint-${currentRowIndex}2`] ? allHints[`hint-${currentRowIndex}2`] : undefined }}></div>
+                <div className="hintCircle" style={{ backgroundColor: allHints[`hint-${currentRowIndex}3`] ? allHints[`hint-${currentRowIndex}3`] : undefined }}></div>
+                <div className="hintCircle" style={{ backgroundColor: allHints[`hint-${currentRowIndex}4`] ? allHints[`hint-${currentRowIndex}4`] : undefined }}></div>
             </div>
         )
     };
 
     const handleCheckButtonClick = (currentRowIndex: number) => {
 
-        const selectedColors: string[] = [];
+        const currentSelectedColors: string[] = [];
         for (let index = 1; index <= 4; index++) {
-            const selectableColorElement = document.getElementById(`selectableColor-${currentRowIndex}${index}`) as any;
-            if (selectableColorElement) {
-                const selectedColor = selectableColorElement.style.backgroundColor;
-                if (selectedColor) {
-                    selectedColors.push(selectedColor);
-                }
+            const selectedColor = selectedColors[`selectableColor-${currentRowIndex}${index}`];
+            if (selectedColor) {
+                currentSelectedColors.push(selectedColor);
             }
         }
 
-        if (selectedColors.length === 4) {
-            if (selectedColors.length !== [...new Set(selectedColors)].length) {
+        if (currentSelectedColors.length === 4) {
+            if (currentSelectedColors.length !== [...new Set(currentSelectedColors)].length) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
@@ -149,8 +144,8 @@ function Board() {
             }
             else {
                 console.log("secretCode", secretCode);
-                console.log("selectedCode", selectedColors);
-                const result = validateCode(secretCode, selectedColors);
+                console.log("selectedCode", currentSelectedColors);
+                const result = validateCode(secretCode, currentSelectedColors);
 
                 if (result.samePosition === 4) {
                     setGameOver(true);
@@ -164,18 +159,18 @@ function Board() {
                 else {
                     setCurrentRowNumber(currentRowNumber + 1);
                 }
-                const hintElement = document.getElementById(`hints-${currentRowIndex}`) as any;
-                const child = hintElement.children;
+                let currentHints = { ...allHints };
                 if (result.samePosition) {
                     for (let i = 0; i < result.samePosition; i++) {
-                        child[i].style.backgroundColor = "green";
+                        currentHints = { ...currentHints, [`hint-${currentRowIndex}${i + 1}`]: "green" };
                     }
                 }
                 if (result.differentPosition) {
                     for (let i = result.samePosition; i < result.samePosition + result.differentPosition; i++) {
-                        child[i].style.backgroundColor = "red";
+                        currentHints = { ...currentHints, [`hint-${currentRowIndex}${i + 1}`]: "red" };
                     }
                 }
+                setAllHints({ ...currentHints });
             }
         }
         else {
@@ -217,18 +212,13 @@ function Board() {
         }
     };
 
-    const resetGame=()=>{
+    const resetGame = () => {
         setCurrentColor(defaultCurrentColor);
         setCurrentRowNumber(1);
         setGameOver(false);
-        addAnimationToFirstColor(true);
         setSecretCode(getRandomColors(4));
-        // for(let i=1;i<=10;i++){
-        //     for(let j=1;j<=4;j++){
-        //         const circle = document.getElementById(`selectableColor-${i}${j}`) as any;
-        //         circle.style.backgroundColor = i === 1 ? "white" : "rgba(239, 239, 239, 0.3)";
-        //     }
-        // }
+        setSelectedColors({});
+        setAllHints({});
     };
 
     return (
@@ -236,7 +226,7 @@ function Board() {
             <Toolbar />
             <Box
                 sx={{
-                    width: '50%',
+                    width: maxWidthMediaQuery ? '100%' : '50%',
                     // height: '100vh',
                     backgroundColor: 'darkgray',
                     margin: 'auto',
@@ -247,7 +237,7 @@ function Board() {
                     sx={{
                         borderBottom: "2px solid black",
                         marginBottom: '5px',
-                        textAlign: "center"
+                        textAlign: "center",
                     }}
                 >
                     <Button
@@ -255,6 +245,7 @@ function Board() {
                         variant="contained"
                         style={{
                             marginBottom: '5px',
+                            padding: '2px 10px'
                         }}
                         onClick={resetGame}
                     >
@@ -285,7 +276,7 @@ function Board() {
                         generateNumbersArray(10).map((_1, index1: number) => {
                             return (
                                 <div key={index1} className="selectableRowContainer">
-                                    <div style={{ marginRight: "1rem" }}>
+                                    <div style={{ marginRight: "0.5rem" }}>
                                         {
                                             generateNumbersArray(4).map((_2, index2: number) => {
                                                 return (
@@ -315,15 +306,15 @@ function Board() {
                     }}
                 >
                     <div className="selectableRowContainer">
-                        <div style={{ marginRight: "1rem" }}>
+                        <div style={{ marginRight: "0.5rem" }}>
                             {
                                 secretCode.map((color: string, index: number) => {
                                     return (
                                         <React.Fragment key={index}>
                                             {
                                                 gameOver ?
-                                                renderCircle(`secretColor-${color}-${index + 1}`, color) :
-                                                renderCircle(`secretColor-${color}-${index + 1}`, undefined, "?")
+                                                    renderCircle(`secretColor-${color}-${index + 1}`, color) :
+                                                    renderCircle(`secretColor-${color}-${index + 1}`, undefined, "?")
                                             }
                                         </React.Fragment>
                                     )
