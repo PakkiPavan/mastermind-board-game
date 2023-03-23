@@ -143,8 +143,6 @@ function Board() {
                 })
             }
             else {
-                console.log("secretCode", secretCode);
-                console.log("selectedCode", currentSelectedColors);
                 const result = validateCode(secretCode, currentSelectedColors);
 
                 if (result.samePosition === 4) {
