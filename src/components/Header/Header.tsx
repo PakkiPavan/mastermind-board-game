@@ -30,10 +30,10 @@ interface Props {
 
 const drawerWidth = 240;
 const navItems = [
-    {
-        label: 'Home',
-        route: '/'
-    },
+    // {
+    //     label: 'Home',
+    //     route: '/'
+    // },
     {
         label: 'Play Game',
         route: '/play-game'
