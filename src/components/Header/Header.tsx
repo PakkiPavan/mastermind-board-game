@@ -15,6 +15,9 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
 import "./Header.css";
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import { useTheme } from '@emotion/react';
 
 interface Props {
     /**
@@ -22,6 +25,7 @@ interface Props {
      * You won't need it on your project.
      */
     window?: () => Window;
+    handleSetCurrentTheme: () => void;
 }
 
 const drawerWidth = 240;
@@ -43,6 +47,7 @@ const navItems = [
 function Header(props: Props) {
     const { window } = props;
     const [mobileOpen, setMobileOpen] = React.useState(false);
+    const theme: any = useTheme();
 
     const handleDrawerToggle = () => {
         setMobileOpen((prevState) => !prevState);
@@ -58,7 +63,7 @@ function Header(props: Props) {
                 {navItems.map((item) => (
                     <ListItem key={item.label} disablePadding>
                         <Link to={item.route}>
-                            <ListItemButton sx={{ textAlign: 'center', color: '#fff' }}>
+                            <ListItemButton sx={{ textAlign: 'center', color: theme.palette.mode === 'dark' ? '#fff' : '#000' }}>
                                 <ListItemText primary={item.label} />
                             </ListItemButton>
                         </Link>
@@ -75,7 +80,9 @@ function Header(props: Props) {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <AppBar component="nav">
-                    <Toolbar>
+                    <Toolbar sx={{
+                        minHeight: '50px !important'
+                    }}>
                         <IconButton
                             color="inherit"
                             aria-label="open drawer"
@@ -101,6 +108,16 @@ function Header(props: Props) {
                                 </Link>
                             ))}
                         </Box>
+                        <Button onClick={props.handleSetCurrentTheme} sx={{
+                            textTransform: 'inherit',
+                            padding: '0',
+                            minWidth: '40px',
+                            outline: 'none !important',
+                            marginLeft: 'auto',
+                            color: theme.palette.mode === 'light' ? "#fff" : null
+                        }}>
+                            {theme.palette.mode === 'dark' ? <LightModeIcon /> : <DarkModeIcon />}
+                        </Button>
                     </Toolbar>
                 </AppBar>
                 <Box component="nav">

@@ -1,8 +1,9 @@
 import React from 'react';
 import "./Board.css";
-import { Button, Toolbar, useMediaQuery } from '@mui/material';
+import { Button, Paper, Toolbar, useMediaQuery } from '@mui/material';
 import Box from '@mui/material/Box';
 import Swal from 'sweetalert2';
+import { useTheme } from '@emotion/react';
 
 const availableColors = ["green", "red", "yellow", "blue", "pink", "skyblue", "black"];
 const defaultCurrentColor = "green";
@@ -28,6 +29,8 @@ function Board() {
     const [selectedColors, setSelectedColors] = React.useState<any>({});
     const [allHints, setAllHints] = React.useState<any>({});
     const maxWidthMediaQuery = useMediaQuery('(max-width:700px)');
+    const theme: any = useTheme();
+    const boardActionsBorder = theme.palette.mode === 'dark' ? "1px solid white" : "1px solid black";
 
     React.useEffect(() => {
         setSecretCode(getRandomColors(4));
@@ -76,8 +79,9 @@ function Board() {
                 style={{
                     backgroundColor: bgColor ? bgColor : (backgroundColor ? backgroundColor : undefined),
                     animation: animationRequired ? circleAnimation : undefined,
-                    width: maxWidthMediaQuery ? '35px' : '40px',
-                    height: maxWidthMediaQuery ? '35px' : '40px',
+                    width: maxWidthMediaQuery ? '35px' : '35px',
+                    height: maxWidthMediaQuery ? '35px' : '35px',
+                    border: !bgColor && theme.palette.mode === 'light' ? '1px solid' : undefined,
                 }}
                 onClick={(event: any) => handleColorClick(event)}
             >{customElement}</button>
@@ -222,27 +226,37 @@ function Board() {
     return (
         <>
             <Toolbar />
-            <Box
+            {/* <Box
                 sx={{
                     width: maxWidthMediaQuery ? '100%' : '50%',
                     // height: '100vh',
-                    backgroundColor: 'darkgray',
+                    // backgroundColor: 'darkgray',
+                    margin: 'auto',
+                }}
+            > */}
+            <Paper
+                elevation={5}
+                sx={{
+                    width: maxWidthMediaQuery ? '100%' : '400px',
+                    // height: '100vh',
+                    // backgroundColor: 'darkgray',
                     margin: 'auto',
                 }}
             >
                 {/* Reset game actions */}
                 <Box
                     sx={{
-                        borderBottom: "2px solid black",
-                        marginBottom: '5px',
+                        borderBottom: boardActionsBorder,
+                        // marginBottom: '5px',
                         textAlign: "center",
+                        padding: '5px 0'
                     }}
                 >
                     <Button
                         color="error"
                         variant="contained"
                         style={{
-                            marginBottom: '5px',
+                            // marginBottom: '5px',
                             padding: '2px 10px'
                         }}
                         onClick={resetGame}
@@ -253,7 +267,7 @@ function Board() {
                 {/* Available Colors */}
                 <Box
                     sx={{
-                        borderBottom: '2px solid black',
+                        borderBottom: boardActionsBorder,
                         marginBottom: '5px',
                         textAlign: 'center'
                     }}
@@ -299,8 +313,9 @@ function Board() {
                 {/* Secret Code */}
                 <Box
                     sx={{
-                        borderTop: '2px solid black',
-                        textAlign: 'center'
+                        borderTop: boardActionsBorder,
+                        textAlign: 'center',
+                        padding: '5px 0'
                     }}
                 >
                     <div className="selectableRowContainer">
@@ -327,7 +342,8 @@ function Board() {
                         </div>
                     </div>
                 </Box>
-            </Box>
+            {/* </Box> */}
+            </Paper>
         </>
     );
 }

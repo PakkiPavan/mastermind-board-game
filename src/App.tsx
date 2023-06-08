@@ -1,3 +1,4 @@
+import React from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Header from './components/Header/Header';
@@ -7,18 +8,26 @@ import {
 } from "react-router-dom";
 import Board from './components/Board/Board';
 import Rules from './components/Rules/Rules';
+import { PaletteMode } from '@mui/material';
 
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-  },
-});
 
 function App() {
+  const [currentTheme, setCurrentTheme] = React.useState<PaletteMode>('dark');
+
+  const theme = createTheme({
+    palette: {
+      mode: currentTheme,
+    },
+  });
+
+  const handleSetCurrentTheme = () => {
+    setCurrentTheme(currentTheme === 'dark' ? 'light' : 'dark');
+  };
+
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Header />
+      <Header handleSetCurrentTheme={handleSetCurrentTheme} />
       <Routes>
         <Route path="/" element={<Board />} />
         <Route path="/play-game" element={<Board />} />
